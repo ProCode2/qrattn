@@ -6,21 +6,27 @@ import json
 
 index_routes = Blueprint('main', __name__, template_folder='templates')
 
+
 @index_routes.route('/')
 def index():
-    classes = []
+    return render_template("index.html")
 
-    print(current_user.is_authenticated)
-    if current_user.is_authenticated:
-        user = User.query.filter_by(name=str(current_user)).first()
-        class_ids = json.loads(user.class_ids)["ids"]
-        print(class_ids)
-        for id in class_ids:
-            classes.append(Class.query.filter_by(id = id).first())
-    print(classes)
-    return render_template("index.html", classes=classes)
 
 @index_routes.route("/profile")
 @login_required
 def profile():
-    return render_template("profile.html", name=current_user.name)
+    classes = []
+
+    print(current_user.is_authenticated)
+
+    if current_user.role == "professor":
+        classes = Class.query.filter_by(creatorId=str(current_user.id)).all()
+    else:
+        user = User.query.filter_by(email=current_user.email).first()
+        print(user)
+        class_ids = json.loads(user.class_ids).get('ids', [])
+        print(class_ids)
+        if class_ids is not None:
+            for id in class_ids:
+                classes.append(Class.query.filter_by(id=id).first())
+    return render_template("profile.html", classes=classes)

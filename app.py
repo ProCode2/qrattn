@@ -1,3 +1,4 @@
+from models.user import User
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -19,11 +20,11 @@ login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
 
-from models.user import User
 
 @login_manager.user_loader
 def load_user(user_id):
-    # since the user_id is just the primary key of our user table, use it in the query for the user
+    # since the user_id is just the primary key of our user table,
+    # use it in the query for the user
     return User.query.get(user_id)
 
 
@@ -32,4 +33,4 @@ app.register_blueprint(auth)
 app.register_blueprint(classes)
 
 
-app.run(debug=True)
+# app.run(debug=True)
